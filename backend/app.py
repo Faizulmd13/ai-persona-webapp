@@ -24,11 +24,7 @@ def index():
 @app.route("/predict", methods=["POST"])
 def predict_persona():
     try:
-        print("Headers:", request.headers)
-        print("Raw Data:", request.data)
-
         data = request.get_json()
-        print("Parsed JSON:", data)
 
         # Create DataFrame with proper columns
         input_df = pd.DataFrame([{
