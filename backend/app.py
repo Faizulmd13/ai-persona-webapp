@@ -4,11 +4,11 @@ import pandas as pd
 from flask_cors import CORS
 import os
 
-# Explicitly tell Flask where to find templates
+# Create the Flask app first
 app = Flask(__name__, template_folder=os.path.join(os.getcwd(), 'templates'))
-CORS(app)  # Allow CORS for communication with frontend
+CORS(app)  # Enable CORS
 
-# Load model and encoders
+# Load ML model and encoders
 model = joblib.load("persona_model.pkl")
 scaler = joblib.load("scaler.pkl")
 education_encoder = joblib.load("education_encoder.pkl")
@@ -30,7 +30,7 @@ def predict_persona():
         data = request.get_json()
         print("Parsed JSON:", data)
 
-        # Create DataFrame with proper column names
+        # Create DataFrame with proper columns
         input_df = pd.DataFrame([{
             "Age": data["age"],
             "Occupation": data["occupation"],
@@ -39,15 +39,13 @@ def predict_persona():
         }])
 
         # Encode categorical features
-        input_df["Education"] = education_encoder.transform(
-            input_df["Education"])
-        input_df["Occupation"] = occupation_encoder.transform(
-            input_df["Occupation"])
+        input_df["Education"] = education_encoder.transform(input_df["Education"])
+        input_df["Occupation"] = occupation_encoder.transform(input_df["Occupation"])
 
         # Scale input
         scaled_input = scaler.transform(input_df)
 
-        # Predict
+        # Predict persona
         prediction = model.predict(scaled_input)[0]
         persona = label_encoder.inverse_transform([prediction])[0]
 
@@ -58,5 +56,7 @@ def predict_persona():
         return jsonify({"error": str(e)}), 400
 
 
+# Run the app (only if this file is run directly)
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
