@@ -1,10 +1,6 @@
 services:
   - type: web
-    name: ai-persona-webapp
+    name: flask-backend
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python app.py"
-    workingDirectory: backend
-    envVars:
-      - key: FLASK_ENV
-        value: production
+    buildCommand: pip install -r requirements.txt
+    startCommand: python backend/app.py
